@@ -1,0 +1,184 @@
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition: opacity var(--transition), transform var(--transition);
+  box-shadow: 0 18px 42px var(--red-glow);
+}
+
+.scroll-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (max-width: 1080px) {
+  .nav-menu {
+    gap: 16px;
+  }
+
+  .six-grid,
+  .pricing-grid,
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .feature-grid,
+  .trainer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .container {
+    width: min(calc(100% - 28px), var(--container));
+  }
+
+  .section {
+    padding: 82px 0;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-menu {
+    position: fixed;
+    inset: 82px 14px auto;
+    display: grid;
+    gap: 0;
+    padding: 14px;
+    background: rgba(5, 5, 5, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    transform: translateY(-16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition), transform var(--transition);
+  }
+
+  .nav-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 13px;
+  }
+
+  .split-layout,
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    min-height: 980px;
+    padding: 120px 0 310px;
+  }
+
+  .hero-metrics {
+    grid-template-columns: 1fr;
+    bottom: 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .testimonial-shell {
+    padding: 34px 54px;
+  }
+
+  .testimonial {
+    text-align: center;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 620px) {
+  .hero {
+    min-height: 940px;
+    padding-bottom: 300px;
+  }
+
+  .hero-actions {
+    display: grid;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .brand-text {
+    font-size: 0.82rem;
+  }
+
+  .about-grid,
+  .six-grid,
+  .feature-grid,
+  .trainer-grid,
+  .pricing-grid,
+  .gallery-grid,
+  .stats-grid,
+  .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .price-card.featured {
+    transform: none;
+  }
+
+  .testimonial-shell {
+    padding: 28px 18px 78px;
+  }
+
+  .slider-btn {
+    top: auto;
+    bottom: 18px;
+    transform: none;
+  }
+
+  .slider-btn.prev {
+    left: calc(50% - 54px);
+  }
+
+  .slider-btn.next {
+    right: calc(50% - 54px);
+  }
+
+  .contact-panel,
+  .contact-form,
+  .progress-card,
+  .bmi-card,
+  .price-card,
+  .program-card,
+  .icon-card {
+    padding: 24px;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+  }
+
+  .newsletter-form button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
