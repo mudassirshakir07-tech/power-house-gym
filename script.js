@@ -1,346 +1,226 @@
-"use strict";
+/* =========================================================
+   THE BRIGHT SOULS SCHOOL — SCRIPT
+========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
-  const header = document.getElementById("siteHeader");
-  const menuToggle = document.getElementById("menuToggle");
-  const navMenu = document.getElementById("navMenu");
-  const navLinks = document.querySelectorAll(".nav-menu a");
-  const scrollProgress = document.querySelector(".scroll-progress span");
-  const scrollTop = document.getElementById("scrollTop");
-  const cursorGlow = document.querySelector(".cursor-glow");
-  const particles = document.getElementById("particles");
+document.addEventListener('DOMContentLoaded', () => {
 
-  const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* ---------- footer year ---------- */
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  if (window.AOS) {
-    AOS.init({
-      duration: 850,
-      easing: "ease-out-cubic",
-      once: true,
-      offset: 90
-    });
-  }
+  /* ---------- nav scroll state ---------- */
+  const nav = document.getElementById('siteNav');
+  const onScroll = () => {
+    if (window.scrollY > 40) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-  if (window.gsap && window.ScrollTrigger) {
-    gsap.registerPlugin(ScrollTrigger);
-    gsap.from(".hero-reveal", {
-      y: 80,
-      opacity: 0,
-      duration: 1.1,
-      stagger: 0.16,
-      ease: "power4.out"
-    });
-    gsap.to(".hero-bg", {
-      scale: 1,
-      duration: 2.2,
-      ease: "power2.out"
-    });
-    gsap.to(".hero-light-one", {
-      x: -60,
-      y: 44,
-      duration: 5,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut"
-    });
-    gsap.to(".hero-light-two", {
-      x: 70,
-      y: -32,
-      duration: 6,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut"
-    });
-    gsap.utils.toArray(".gallery-item img, .trainer-card img").forEach((image) => {
-      gsap.to(image, {
-        yPercent: -8,
-        ease: "none",
-        scrollTrigger: {
-          trigger: image,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 0.8
+  /* ---------- mobile menu ---------- */
+  const burger = document.getElementById('burgerBtn');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('open');
+    burger.classList.toggle('open', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
+  });
+  navLinks.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+    })
+  );
+
+  /* ---------- smooth scroll for in-page anchors ---------- */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const id = link.getAttribute('href');
+      if (id.length > 1) {
+        const target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      });
-    });
-    gsap.utils.toArray(".section-heading, .section-copy").forEach((item) => {
-      gsap.from(item, {
-        opacity: 0,
-        y: 34,
-        duration: 0.9,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: item,
-          start: "top 82%"
-        }
-      });
-    });
-  }
-
-  const createParticles = () => {
-    if (!particles || isReducedMotion) return;
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < 58; i += 1) {
-      const particle = document.createElement("span");
-      particle.className = "particle";
-      particle.style.left = `${Math.random() * 100}%`;
-      particle.style.top = `${Math.random() * 100}%`;
-      particle.style.animationDuration = `${8 + Math.random() * 12}s`;
-      particle.style.animationDelay = `${Math.random() * 8}s`;
-      particle.style.opacity = String(0.3 + Math.random() * 0.7);
-      fragment.appendChild(particle);
-    }
-    particles.appendChild(fragment);
-  };
-
-  createParticles();
-
-  const updateScrollState = () => {
-    const scrollY = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = maxScroll > 0 ? (scrollY / maxScroll) * 100 : 0;
-    header.classList.toggle("scrolled", scrollY > 40);
-    scrollTop.classList.toggle("visible", scrollY > 640);
-    scrollProgress.style.width = `${progress}%`;
-  };
-
-  updateScrollState();
-  window.addEventListener("scroll", updateScrollState, { passive: true });
-
-  menuToggle.addEventListener("click", () => {
-    const isOpen = navMenu.classList.toggle("active");
-    menuToggle.classList.toggle("active", isOpen);
-    document.body.classList.toggle("menu-open", isOpen);
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
-  });
-
-  navLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      navMenu.classList.remove("active");
-      menuToggle.classList.remove("active");
-      document.body.classList.remove("menu-open");
-      menuToggle.setAttribute("aria-expanded", "false");
-    });
-  });
-
-  const sections = [...document.querySelectorAll("main section[id]")];
-  const setActiveNav = () => {
-    const current = sections
-      .filter((section) => window.scrollY >= section.offsetTop - 140)
-      .pop();
-    navLinks.forEach((link) => {
-      link.classList.toggle("active", current && link.getAttribute("href") === `#${current.id}`);
-    });
-  };
-
-  setActiveNav();
-  window.addEventListener("scroll", setActiveNav, { passive: true });
-
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener("click", (event) => {
-      const target = document.querySelector(anchor.getAttribute("href"));
-      if (!target) return;
-      event.preventDefault();
-      target.scrollIntoView({ behavior: isReducedMotion ? "auto" : "smooth", block: "start" });
-    });
-  });
-
-  scrollTop.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: isReducedMotion ? "auto" : "smooth" });
-  });
-
-  if (cursorGlow && !isReducedMotion && window.matchMedia("(pointer: fine)").matches) {
-    window.addEventListener("pointermove", (event) => {
-      cursorGlow.style.opacity = "1";
-      cursorGlow.style.transform = `translate(${event.clientX - 140}px, ${event.clientY - 140}px)`;
-    });
-    window.addEventListener("pointerleave", () => {
-      cursorGlow.style.opacity = "0";
-    });
-  }
-
-  document.querySelectorAll(".magnetic-btn").forEach((button) => {
-    button.addEventListener("mousemove", (event) => {
-      if (isReducedMotion) return;
-      const rect = button.getBoundingClientRect();
-      const x = event.clientX - rect.left - rect.width / 2;
-      const y = event.clientY - rect.top - rect.height / 2;
-      button.style.transform = `translate(${x * 0.12}px, ${y * 0.18}px)`;
-    });
-    button.addEventListener("mouseleave", () => {
-      button.style.transform = "";
-    });
-  });
-
-  const counterObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const counter = entry.target;
-      const target = Number(counter.dataset.target);
-      const duration = 1500;
-      const start = performance.now();
-      const animate = (time) => {
-        const progress = Math.min((time - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        counter.textContent = Math.floor(target * eased).toLocaleString();
-        if (progress < 1) requestAnimationFrame(animate);
-      };
-      requestAnimationFrame(animate);
-      observer.unobserve(counter);
-    });
-  }, { threshold: 0.5 });
-
-  document.querySelectorAll(".counter").forEach((counter) => counterObserver.observe(counter));
-
-  const progressObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const bar = entry.target;
-      bar.style.width = `${bar.dataset.progress}%`;
-      observer.unobserve(bar);
-          });
-  }, { threshold: 0.6 });
-
-  document.querySelectorAll(".progress-bar span").forEach((bar) => progressObserver.observe(bar));
-
-  const testimonials = [...document.querySelectorAll(".testimonial")];
-  const prevTestimonial = document.getElementById("prevTestimonial");
-  const nextTestimonial = document.getElementById("nextTestimonial");
-  const testimonialDots = document.getElementById("testimonialDots");
-  let testimonialIndex = 0;
-  let testimonialTimer;
-
-  const buildDots = () => {
-    testimonials.forEach((_, index) => {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.setAttribute("aria-label", `Show testimonial ${index + 1}`);
-      dot.addEventListener("click", () => showTestimonial(index));
-      testimonialDots.appendChild(dot);
-    });
-  };
-
-  const showTestimonial = (index) => {
-    testimonialIndex = (index + testimonials.length) % testimonials.length;
-    testimonials.forEach((testimonial, itemIndex) => {
-      testimonial.classList.toggle("active", itemIndex === testimonialIndex);
-      if (itemIndex === testimonialIndex && window.gsap) {
-        gsap.fromTo(testimonial, { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" });
       }
     });
-    [...testimonialDots.children].forEach((dot, dotIndex) => {
-      dot.classList.toggle("active", dotIndex === testimonialIndex);
-    });
-    window.clearInterval(testimonialTimer);
-    testimonialTimer = window.setInterval(() => showTestimonial(testimonialIndex + 1), 5800);
-  };
+  });
 
-  if (testimonials.length) {
-    buildDots();
-    showTestimonial(0);
-    prevTestimonial.addEventListener("click", () => showTestimonial(testimonialIndex - 1));
-    nextTestimonial.addEventListener("click", () => showTestimonial(testimonialIndex + 1));
+  /* ---------- scroll reveal ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  /* ---------- animated stat counters ---------- */
+  const statNums = document.querySelectorAll('.stat__num');
+  const animateCount = (el) => {
+    const target = parseInt(el.dataset.target, 10) || 0;
+    const duration = 1600;
+    const start = performance.now();
+    const step = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        statNums.forEach(animateCount);
+        statsObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.4 });
+  const statsContainer = document.querySelector('.stats');
+  if (statsContainer) statsObserver.observe(statsContainer);
+
+  /* ---------- contact form (front-end only) ---------- */
+  const form = document.getElementById('contactForm');
+  const note = document.getElementById('formNote');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      const label = btn.querySelector('.btn-label');
+      const originalText = label.textContent;
+      label.textContent = 'Sending...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        label.textContent = originalText;
+        btn.disabled = false;
+        note.textContent = 'Thank you! Our admissions team will reach out soon, or call +92 300 1111690 directly.';
+        form.reset();
+        setTimeout(() => { note.textContent = ''; }, 6000);
+      }, 900);
+    });
   }
 
-  const filterButtons = document.querySelectorAll(".filter-btn");
-  const galleryItems = document.querySelectorAll(".gallery-item");
-  const lightbox = document.getElementById("lightbox");
-  const lightboxImage = document.getElementById("lightboxImage");
-  const lightboxClose = document.getElementById("lightboxClose");
+  /* ---------- marquee: duplicate track for seamless infinite loop ---------- */
+  const track = document.getElementById('marqueeTrack');
+  if (track) {
+    track.innerHTML += track.innerHTML;
+  }
 
-  filterButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const filter = button.dataset.filter;
-      filterButtons.forEach((btn) => btn.classList.remove("active"));
-      button.classList.add("active");
-      galleryItems.forEach((item) => {
-        const shouldShow = filter === "all" || item.dataset.category === filter;
-        if (shouldShow) item.classList.remove("hidden");
-        if (window.gsap) {
-          gsap.to(item, {
-            opacity: shouldShow ? 1 : 0,
-            scale: shouldShow ? 1 : 0.88,
-            duration: 0.24,
-            onComplete: () => item.classList.toggle("hidden", !shouldShow)
-          });
-        } else {
-          item.classList.toggle("hidden", !shouldShow);
+  /* ---------- hero "bright souls" particle canvas ---------- */
+  const canvas = document.getElementById('soulCanvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width, height, particles;
+    const PARTICLE_COUNT = 70;
+
+    function resize() {
+      const hero = canvas.parentElement;
+      width = canvas.width = hero.offsetWidth;
+      height = canvas.height = hero.offsetHeight;
+    }
+
+    function createParticles() {
+      particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 1.8 + 0.6,
+        baseAlpha: Math.random() * 0.5 + 0.25,
+        speedX: (Math.random() - 0.5) * 0.18,
+        speedY: (Math.random() - 0.5) * 0.18,
+        twinkleSpeed: Math.random() * 0.02 + 0.008,
+        twinklePhase: Math.random() * Math.PI * 2
+      }));
+    }
+
+    let mouseX = -9999, mouseY = -9999;
+    canvas.parentElement.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    });
+    canvas.parentElement.addEventListener('mouseleave', () => {
+      mouseX = -9999; mouseY = -9999;
+    });
+
+    function drawLink(p1, p2, alpha) {
+      ctx.strokeStyle = `rgba(124,155,255,${alpha})`;
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+
+    function tick(t) {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        // gentle drift toward cursor (soul drawn to light)
+        const dx = mouseX - p.x, dy = mouseY - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 160) {
+          p.x += dx * 0.0025;
+          p.y += dy * 0.0025;
         }
+
+        // wrap around edges
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+        if (p.y < -10) p.y = height + 10;
+        if (p.y > height + 10) p.y = -10;
+
+        const twinkle = Math.sin(t * p.twinkleSpeed + p.twinklePhase) * 0.5 + 0.5;
+        const alpha = p.baseAlpha * (0.5 + twinkle * 0.5);
+
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+        glow.addColorStop(0, `rgba(124,155,255,${alpha})`);
+        glow.addColorStop(1, 'rgba(124,155,255,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(238,241,251,${alpha + 0.2})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
       });
-    });
-  });
 
-  galleryItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      lightboxImage.src = item.dataset.full;
-      lightbox.classList.add("active");
-      lightbox.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    });
-  });
+      // constellation links between nearby souls
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i], b = particles[j];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < 110) {
+            drawLink(a, b, (1 - d / 110) * 0.12);
+          }
+        }
+      }
 
-  const closeLightbox = () => {
-    lightbox.classList.remove("active");
-    lightbox.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-    lightboxImage.src = "";
-  };
-
-  lightboxClose.addEventListener("click", closeLightbox);
-  lightbox.addEventListener("click", (event) => {
-    if (event.target === lightbox) closeLightbox();
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && lightbox.classList.contains("active")) closeLightbox();
-  });
-
-  const bmiForm = document.getElementById("bmiForm");
-  const bmiResult = document.getElementById("bmiResult");
-
-  bmiForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const height = Number(document.getElementById("height").value);
-    const weight = Number(document.getElementById("weight").value);
-    if (!height || !weight || height < 80 || weight < 25) {
-      bmiResult.innerHTML = "<span>Please enter a valid height and weight.</span>";
-      return;
+      requestAnimationFrame(tick);
     }
-    const bmi = weight / Math.pow(height / 100, 2);
-    let category = "Healthy";
-    if (bmi < 18.5) category = "Underweight";
-    if (bmi >= 25) category = "Overweight";
-    if (bmi >= 30) category = "Obesity range";
-    bmiResult.innerHTML = `<span>Your BMI is <strong>${bmi.toFixed(1)}</strong>. Category: <strong>${category}</strong>.</span>`;
-  });
 
-  const newsletterForm = document.getElementById("newsletterForm");
-  const newsletterEmail = document.getElementById("newsletterEmail");
-  const newsletterStatus = document.getElementById("newsletterStatus");
+    resize();
+    createParticles();
+    requestAnimationFrame(tick);
 
-  newsletterForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail.value)) {
-      newsletterStatus.textContent = "Enter a valid email address.";
-      return;
-    }
-    newsletterStatus.textContent = "You are subscribed to Power House updates.";
-    newsletterForm.reset();
-  });
-
-  if ("loading" in HTMLImageElement.prototype) {
-    document.querySelectorAll("img").forEach((image) => {
-      image.loading = image.loading || "lazy";
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resize();
+        createParticles();
+      }, 200);
     });
-  } else if ("IntersectionObserver" in window) {
-    const lazyImages = document.querySelectorAll("img[data-src]");
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const image = entry.target;
-        image.src = image.dataset.src;
-        observer.unobserve(image);
-      });
-    });
-    lazyImages.forEach((image) => imageObserver.observe(image));
   }
+
 });
